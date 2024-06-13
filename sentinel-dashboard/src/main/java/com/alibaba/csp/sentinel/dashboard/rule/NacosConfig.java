@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.csp.sentinel.dashboard.rule.nacos;
+package com.alibaba.csp.sentinel.dashboard.rule;
 
 import java.util.List;
+import java.util.Properties;
 
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.DegradeRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.FlowRuleEntity;
 import com.alibaba.csp.sentinel.datasource.Converter;
 import com.alibaba.fastjson.JSON;
@@ -44,7 +46,22 @@ public class NacosConfig {
     }
 
     @Bean
+    public Converter<List<DegradeRuleEntity>, String> degradeRuleEntityEncoder() {
+        return JSON::toJSONString;
+    }
+
+    @Bean
+    public Converter<String, List<DegradeRuleEntity>> degradeRuleEntityDecoder() {
+        return s -> JSON.parseArray(s, DegradeRuleEntity.class);
+    }
+
+
+
+    @Bean
     public ConfigService nacosConfigService() throws Exception {
-        return ConfigFactory.createConfigService("localhost");
+        final Properties properties = new Properties();
+        properties.put("serverAddr", "127.0.0.1:8848");
+        properties.put("namespace", "d922c8fc-2275-46d9-b7cb-36386d3ba24b");
+        return ConfigFactory.createConfigService(properties);
     }
 }
